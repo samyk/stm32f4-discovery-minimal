@@ -1,17 +1,26 @@
-SRCS=*.c
+# update this path to your stm periph lib
+STM_PERIPH=../STM32F4xx_DSP_StdPeriph_Lib_V1.9.0
 
-STM_PERIPH=STM32F4xx_DSP_StdPeriph_Lib_V1.8.0
+# update this to match your target board
+TARGET = STM32F446RE
+
+BOARD=$(shell grep ${STM_PERIPH}/Libraries/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h -e ${TARGET} | perl -ne 'print $$1 if /\#define\s+(\w+)/')
+# or set BOARD=STM32F446xx (or whatever based on stm32f4xx.h)
+#BOARD = STM32F446xx
+#BOARD = STM32F429_439xx
+
+SRCS=*.c
 
 CC=arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
 
-CFLAGS = -g -O2 -Wall 
-CFLAGS += -T$(STM_PERIPH)/Project/STM32F4xx_StdPeriph_Templates/TrueSTUDIO/STM32F429_439xx/STM32F439NI_FLASH.ld
+CFLAGS = -g -O2 -Wall
+CFLAGS += -T $(STM_PERIPH)/Project/STM32F4xx_StdPeriph_Templates/TrueSTUDIO/$(BOARD)/*_FLASH.ld
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += --specs=nosys.specs
 CFLAGS += -DUSE_STDPERIPH_DRIVER
-CFLAGS += -DSTM32F429_439xx #Update this to match your board.
+CFLAGS += -D$(BOARD) # -DSTM32F446RE # -DSTM32F429_439xx #Update this to match your board.
 CFLAGS += -I.
 CFLAGS += -I$(STM_PERIPH)/Libraries/CMSIS/Include
 CFLAGS += -I$(STM_PERIPH)/Libraries/CMSIS/Device/ST/STM32F4xx/Include
